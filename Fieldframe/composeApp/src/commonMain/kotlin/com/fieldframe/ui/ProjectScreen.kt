@@ -152,12 +152,12 @@ fun ProjectScreen(
         ) {
             vm.error?.let { ErrorBanner(it) }
             Panel {
-                Field("Project name", vm.name, vm::setName)
+                Field("Project name", vm.name, vm::updateName)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Field("Reference / ID", vm.reference, vm::setReference, Modifier.weight(1f))
-                    Field("Date", vm.date, vm::setDate, Modifier.weight(1f))
+                    Field("Reference / ID", vm.reference, vm::updateReference, Modifier.weight(1f))
+                    Field("Date", vm.date, vm::updateDate, Modifier.weight(1f))
                 }
-                Field("Description", vm.description, vm::setDescription, singleLine = false)
+                Field("Description", vm.description, vm::updateDescription, singleLine = false)
                 BeforeAfterToggle(current.project.beforeAfterEnabled, vm::setBeforeAfter)
             }
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {

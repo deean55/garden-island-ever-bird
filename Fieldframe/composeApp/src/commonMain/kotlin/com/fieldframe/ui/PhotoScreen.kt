@@ -122,7 +122,7 @@ fun PhotoScreen(
                 QuietButton("Later", onClick = { vm.shift(1) })
             }
             Text("Zoom", style = MaterialTheme.typography.labelSmall, color = MutedFg)
-            Slider(value = vm.zoom, onValueChange = vm::setZoom, valueRange = 1f..4f)
+            Slider(value = vm.zoom, onValueChange = vm::updateZoom, valueRange = 1f..4f)
             Field("Description", vm.description, { vm.setDescription(it, photo) }, singleLine = false, placeholder = "What this photograph shows")
         }
     }

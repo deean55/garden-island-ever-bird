@@ -47,10 +47,10 @@ class ProjectViewModel(
         hydrated = true
     }
 
-    fun setName(value: String) { name = value; scheduleSave() }
-    fun setReference(value: String) { reference = value; scheduleSave() }
-    fun setDate(value: String) { date = value; scheduleSave() }
-    fun setDescription(value: String) { description = value; scheduleSave() }
+    fun updateName(value: String) { name = value; scheduleSave() }
+    fun updateReference(value: String) { reference = value; scheduleSave() }
+    fun updateDate(value: String) { date = value; scheduleSave() }
+    fun updateDescription(value: String) { description = value; scheduleSave() }
 
     private fun scheduleSave() {
         saveJob?.cancel()

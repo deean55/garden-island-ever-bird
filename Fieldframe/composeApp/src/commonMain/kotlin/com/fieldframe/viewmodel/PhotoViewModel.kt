@@ -56,7 +56,7 @@ class PhotoViewModel(
         }
     }
 
-    fun setZoom(value: Float) {
+    fun updateZoom(value: Float) {
         zoom = value.coerceIn(1f, 4f)
     }
 

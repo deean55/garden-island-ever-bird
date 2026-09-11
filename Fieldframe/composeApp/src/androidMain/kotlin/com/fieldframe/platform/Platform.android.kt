@@ -31,7 +31,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import com.fieldframe.shared.model.ImageBytes
-import com.fieldframe.theme.CardShape
+import com.fieldframe.ui.CardShape
 import com.fieldframe.theme.Paper
 import java.io.File
 
