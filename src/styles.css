@@ -1,0 +1,98 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@theme {
+  --font-sans: "Figtree", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Newsreader", ui-serif, Georgia, "Times New Roman", serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
+
+  --color-background: #f3efe6;
+  --color-foreground: #1c1915;
+  --color-card: #faf7f1;
+  --color-card-foreground: #1c1915;
+  --color-popover: #faf7f1;
+  --color-popover-foreground: #1c1915;
+  --color-primary: #1e4336;
+  --color-primary-foreground: #f4efe6;
+  --color-secondary: #ece6da;
+  --color-secondary-foreground: #1c1915;
+  --color-muted: #e7e0d3;
+  --color-muted-foreground: #6b6458;
+  --color-accent: #ddd4c4;
+  --color-accent-foreground: #1c1915;
+  --color-destructive: #8f2d2d;
+  --color-destructive-foreground: #faf7f1;
+  --color-border: #d8d0c0;
+  --color-input: #d8d0c0;
+  --color-ring: #1e4336;
+  --color-ink: #1c1915;
+  --color-paper: #f3efe6;
+  --color-forest: #1e4336;
+  --color-forest-soft: #2d5a49;
+  --color-rule: #cfc6b6;
+
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius: 0.75rem;
+
+  --shadow-border:
+    0 0 0 1px rgb(28 25 21 / 0.06),
+    0 1px 2px -1px rgb(28 25 21 / 0.06),
+    0 2px 8px 0 rgb(28 25 21 / 0.04);
+  --shadow-border-hover:
+    0 0 0 1px rgb(28 25 21 / 0.1),
+    0 1px 2px -1px rgb(28 25 21 / 0.08),
+    0 8px 20px -8px rgb(28 25 21 / 0.12);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    background: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    min-height: 100dvh;
+    background: var(--color-background);
+    color: var(--color-foreground);
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  img.doc-photo {
+    outline: 1px solid rgb(28 25 21 / 0.1);
+    outline-offset: -1px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

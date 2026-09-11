@@ -1,0 +1,38 @@
+{
+  "url": "http://127.0.0.1:8081/",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "Fieldframe",
+      "hasCanvas": false,
+      "bodyTextLen": 283,
+      "bodyTextHash": "23927a2351b2de0efc9acb24713d22d75e16d7afe5d89b5d672d38e9da9ec814",
+      "bodyTextPrefix": "FIELDFRAME Photo records Inspection, property, vehicle, and site",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-built.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "Fieldframe",
+      "hasCanvas": false,
+      "bodyTextLen": 283,
+      "bodyTextHash": "23927a2351b2de0efc9acb24713d22d75e16d7afe5d89b5d672d38e9da9ec814",
+      "bodyTextPrefix": "FIELDFRAME Photo records Inspection, property, vehicle, and site",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-built-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "authWarnings": [],
+  "verdictFile": "/workspace/screenshots/app-builder-built.json",
+  "divergesFromBaseline": false,
+  "baselineReasons": []
+}
