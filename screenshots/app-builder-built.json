@@ -7,9 +7,9 @@
       "status": 200,
       "title": "Fieldframe",
       "hasCanvas": false,
-      "bodyTextLen": 292,
-      "bodyTextHash": "5c4ebc154695c79183f3331796103d71fb2c8c380da3c203f984bbccacfb53f1",
-      "bodyTextPrefix": "FIELDFRAME · KOTLIN Photo records Inspection, property, vehicle,",
+      "bodyTextLen": 306,
+      "bodyTextHash": "8cc31f9754ecdae7abadf23d023910fa9c112424a9806854b7ee0dfa4ed23910",
+      "bodyTextPrefix": "FIELDFRAME · KOTLIN MULTIPLATFORM Photo records Inspection, prop",
       "horizontalOverflow": false,
       "consoleErrors": [],
       "pageErrors": [],
@@ -21,9 +21,9 @@
       "status": 200,
       "title": "Fieldframe",
       "hasCanvas": false,
-      "bodyTextLen": 117,
-      "bodyTextHash": "fdb01a058b938672c80f883f8f371a730b0405241137e58d149a6d4c2db5e5af",
-      "bodyTextPrefix": "FIELDFRAME · KOTLIN Photo records Inspection, property, vehicle,",
+      "bodyTextLen": 131,
+      "bodyTextHash": "7815fc5e1f8a6b73cd299a8214593e3d0ac34aae68fbeaf322d302d85b8c2b94",
+      "bodyTextPrefix": "FIELDFRAME · KOTLIN MULTIPLATFORM Photo records Inspection, prop",
       "horizontalOverflow": false,
       "consoleErrors": [],
       "pageErrors": [],
@@ -35,6 +35,6 @@
   "verdictFile": "/workspace/screenshots/app-builder-built.json",
   "divergesFromBaseline": true,
   "baselineReasons": [
-    "mobile: body text collapsed (292 -> 117 chars)"
+    "mobile: body text collapsed (306 -> 131 chars)"
   ]
 }

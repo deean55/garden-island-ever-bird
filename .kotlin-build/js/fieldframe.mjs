@@ -8182,7 +8182,7 @@ function dashboardView() {
   var page = el('div', 'ff-page');
   var header = el('header', 'ff-hero');
   var copy = el('div');
-  add_0(copy, el('p', 'ff-kicker', 'FIELDFRAME \xB7 KOTLIN'));
+  add_0(copy, el('p', 'ff-kicker', 'FIELDFRAME \xB7 KOTLIN MULTIPLATFORM'));
   add_0(copy, el('h1', 'ff-title', 'Photo records'));
   add_0(copy, el('p', 'ff-lede', 'Inspection, property, vehicle, and site documentation \u2014 stored only on this device.'));
   add_0(header, copy);

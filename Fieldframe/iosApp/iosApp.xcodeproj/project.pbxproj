@@ -1,0 +1,8 @@
+// Minimal Xcode project. Prefer opening the Fieldframe folder in Android Studio
+// (it can generate/run the iOS target) or creating a new iOS App that links
+// the ComposeApp framework produced by Gradle:
+//   ./gradlew :composeApp:embedAndSignAppleFrameworkForXcode
+//
+// PRODUCT_BUNDLE_IDENTIFIER = com.fieldframe.app
+// SWIFT_ENTRY = iosApp/iOSApp.swift
+// INFOPLIST = iosApp/iosApp/Info.plist

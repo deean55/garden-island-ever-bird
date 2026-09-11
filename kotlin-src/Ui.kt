@@ -86,7 +86,7 @@ fun dashboardView(): dynamic {
     val page = el("div", "ff-page")
     val header = el("header", "ff-hero")
     val copy = el("div")
-    add(copy, el("p", "ff-kicker", "FIELDFRAME · KOTLIN"))
+    add(copy, el("p", "ff-kicker", "FIELDFRAME · KOTLIN MULTIPLATFORM"))
     add(copy, el("h1", "ff-title", "Photo records"))
     add(copy, el("p", "ff-lede", "Inspection, property, vehicle, and site documentation — stored only on this device."))
     add(header, copy)

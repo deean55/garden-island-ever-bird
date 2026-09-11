@@ -1,0 +1,1 @@
+import{i as e}from"./index-HBVmir1U.js";import{t}from"./kotlin-host-B6icQ-QH.js";var n=e();function r(){return(0,n.jsx)(t,{})}export{r as component};

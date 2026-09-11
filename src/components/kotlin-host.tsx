@@ -45,7 +45,7 @@ export function KotlinHost() {
       <div className="ff-page">
         <header className="ff-hero">
           <div>
-            <p className="ff-kicker">FIELDFRAME · KOTLIN</p>
+            <p className="ff-kicker">FIELDFRAME · KOTLIN MULTIPLATFORM</p>
             <h1 className="ff-title">Photo records</h1>
             <p className="ff-lede">
               Inspection, property, vehicle, and site documentation — stored only on this device.

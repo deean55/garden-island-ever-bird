@@ -1,0 +1,1 @@
+import{r as e}from"./rolldown-runtime-W7wSyTde.js";import{a as t,i as n,n as r,r as i}from"./index-HBVmir1U.js";import{t as a}from"./kotlin-host-B6icQ-QH.js";var o=e(t()),s=n();function c(){let{projectId:e}=i({from:`/project/$projectId/`}),t=r();return(0,o.useEffect)(()=>{t({to:`/`,hash:`/project/${e}`})},[t,e]),(0,s.jsx)(a,{})}export{c as component};
