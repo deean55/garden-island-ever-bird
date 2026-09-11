@@ -1,4 +1,4 @@
-import { i as __toESM } from "../_runtime.mjs";
+import { i as __toESM, n as __exportAll } from "../_runtime.mjs";
 import { i as require_pako, n as Font, r as FontNames, t as Encodings } from "./pako+pdf-lib__standard-fonts.mjs";
 import { t as UPNG } from "./pdf-lib__upng.mjs";
 import { __assign, __awaiter, __extends, __generator, __rest, __spreadArrays } from "tslib";
@@ -89,6 +89,10 @@ var copyStringIntoBuffer = function(str, buffer, offset) {
 	for (var idx = 0; idx < length; idx++) buffer[offset++] = str.charCodeAt(idx);
 	return length;
 };
+var addRandomSuffix = function(prefix, suffixLength) {
+	if (suffixLength === void 0) suffixLength = 4;
+	return prefix + "-" + Math.floor(Math.random() * Math.pow(10, suffixLength));
+};
 var escapeRegExp = function(str) {
 	return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 };
@@ -100,6 +104,12 @@ var escapedNewlineChars = [
 	"\\f",
 	"\\r",
 	"\\u000B"
+];
+var newlineChars = [
+	"\n",
+	"\f",
+	"\r",
+	"\v"
 ];
 var isNewlineChar = function(text) {
 	return /^[\n\f\r\u000B]$/.test(text);
@@ -301,6 +311,125 @@ var waitForTick = function() {
 };
 //#endregion
 //#region node_modules/pdf-lib/es/utils/unicode.js
+/**
+* Encodes a string to UTF-8.
+*
+* @param input The string to be encoded.
+* @param byteOrderMark Whether or not a byte order marker (BOM) should be added
+*                      to the start of the encoding. (default `true`)
+* @returns A Uint8Array containing the UTF-8 encoding of the input string.
+*
+* -----------------------------------------------------------------------------
+*
+* JavaScript strings are composed of Unicode code points. Code points are
+* integers in the range 0 to 1,114,111 (0x10FFFF). When serializing a string,
+* it must be encoded as a sequence of words. A word is typically 8, 16, or 32
+* bytes in size. As such, Unicode defines three encoding forms: UTF-8, UTF-16,
+* and UTF-32. These encoding forms are described in the Unicode standard [1].
+* This function implements the UTF-8 encoding form.
+*
+* -----------------------------------------------------------------------------
+*
+* In UTF-8, each code point is mapped to a sequence of 1, 2, 3, or 4 bytes.
+* Note that the logic which defines this mapping is slightly convoluted, and
+* not as straightforward as the mapping logic for UTF-16 or UTF-32. The UTF-8
+* mapping logic is as follows [2]:
+*
+* • If a code point is in the range U+0000..U+007F, then view it as a 7-bit
+*   integer: 0bxxxxxxx. Map the code point to 1 byte with the first high order
+*   bit set to 0:
+*
+*       b1=0b0xxxxxxx
+*
+* • If a code point is in the range U+0080..U+07FF, then view it as an 11-bit
+*   integer: 0byyyyyxxxxxx. Map the code point to 2 bytes with the first 5 bits
+*   of the code point stored in the first byte, and the last 6 bits stored in
+*   the second byte:
+*
+*       b1=0b110yyyyy    b2=0b10xxxxxx
+*
+* • If a code point is in the range U+0800..U+FFFF, then view it as a 16-bit
+*   integer, 0bzzzzyyyyyyxxxxxx. Map the code point to 3 bytes with the first
+*   4 bits stored in the first byte, the next 6 bits stored in the second byte,
+*   and the last 6 bits in the third byte:
+*
+*       b1=0b1110zzzz    b2=0b10yyyyyy    b3=0b10xxxxxx
+*
+* • If a code point is in the range U+10000...U+10FFFF, then view it as a
+*   21-bit integer, 0bvvvzzzzzzyyyyyyxxxxxx. Map the code point to 4 bytes with
+*   the first 3 bits stored in the first byte, the next 6 bits stored in the
+*   second byte, the next 6 bits stored in the third byte, and the last 6 bits
+*   stored in the fourth byte:
+*
+*       b1=0b11110xxx    b2=0b10zzzzzz    b3=0b10yyyyyy    b4=0b10xxxxxx
+*
+* -----------------------------------------------------------------------------
+*
+* It is important to note, when iterating through the code points of a string
+* in JavaScript, that if a character is encoded as a surrogate pair it will
+* increase the string's length by 2 instead of 1 [4]. For example:
+*
+* ```
+* > 'a'.length
+* 1
+* > '💩'.length
+* 2
+* > '語'.length
+* 1
+* > 'a💩語'.length
+* 4
+* ```
+*
+* The results of the above example are explained by the fact that the
+* characters 'a' and '語' are not represented by surrogate pairs, but '💩' is.
+*
+* Because of this idiosyncrasy in JavaScript's string implementation and APIs,
+* we must "jump" an extra index after encoding a character as a surrogate
+* pair. In practice, this means we must increment the index of our for loop by
+* 2 if we encode a surrogate pair, and 1 in all other cases.
+*
+* -----------------------------------------------------------------------------
+*
+* References:
+*   - [1] https://www.unicode.org/versions/Unicode12.0.0/UnicodeStandard-12.0.pdf
+*         3.9  Unicode Encoding Forms - UTF-8
+*   - [2] http://www.herongyang.com/Unicode/UTF-8-UTF-8-Encoding.html
+*   - [3] http://www.herongyang.com/Unicode/UTF-8-UTF-8-Encoding-Algorithm.html
+*   - [4] https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/length#Description
+*
+*/
+var utf8Encode = function(input, byteOrderMark) {
+	if (byteOrderMark === void 0) byteOrderMark = true;
+	var encoded = [];
+	if (byteOrderMark) encoded.push(239, 187, 191);
+	for (var idx = 0, len = input.length; idx < len;) {
+		var codePoint = input.codePointAt(idx);
+		if (codePoint < 128) {
+			var byte1 = codePoint & 127;
+			encoded.push(byte1);
+			idx += 1;
+		} else if (codePoint < 2048) {
+			var byte1 = codePoint >> 6 & 31 | 192;
+			var byte2 = codePoint & 63 | 128;
+			encoded.push(byte1, byte2);
+			idx += 1;
+		} else if (codePoint < 65536) {
+			var byte1 = codePoint >> 12 & 15 | 224;
+			var byte2 = codePoint >> 6 & 63 | 128;
+			var byte3 = codePoint & 63 | 128;
+			encoded.push(byte1, byte2, byte3);
+			idx += 1;
+		} else if (codePoint < 1114112) {
+			var byte1 = codePoint >> 18 & 7 | 240;
+			var byte2 = codePoint >> 12 & 63 | 128;
+			var byte3 = codePoint >> 6 & 63 | 128;
+			var byte4 = codePoint >> 0 & 63 | 128;
+			encoded.push(byte1, byte2, byte3, byte4);
+			idx += 2;
+		} else throw new Error("Invalid code point: 0x" + toHexString(codePoint));
+	}
+	return new Uint8Array(encoded);
+};
 /**
 * Encodes a string to UTF-16.
 *
@@ -822,7 +951,7 @@ var ReparseError = function(_super) {
 	}
 	return ReparseError;
 }(Error);
-(function(_super) {
+var MissingCatalogError = function(_super) {
 	__extends(MissingCatalogError, _super);
 	function MissingCatalogError(ref) {
 		var _this = this;
@@ -831,7 +960,7 @@ var ReparseError = function(_super) {
 		return _this;
 	}
 	return MissingCatalogError;
-})(Error);
+}(Error);
 var MissingPageContentsEmbeddingError = function(_super) {
 	__extends(MissingPageContentsEmbeddingError, _super);
 	function MissingPageContentsEmbeddingError() {
@@ -8137,6 +8266,13 @@ var RotationTypes;
 	RotationTypes["Degrees"] = "degrees";
 	RotationTypes["Radians"] = "radians";
 })(RotationTypes || (RotationTypes = {}));
+var radians = function(radianAngle) {
+	assertIs(radianAngle, "radianAngle", ["number"]);
+	return {
+		type: RotationTypes.Radians,
+		angle: radianAngle
+	};
+};
 var degrees = function(degreeAngle) {
 	assertIs(degreeAngle, "degreeAngle", ["number"]);
 	return {
@@ -8220,6 +8356,9 @@ var rotateRectangle = function(rectangle, borderWidth, degreeAngle) {
 var clip = function() {
 	return PDFOperator.of(PDFOperatorNames_default.ClipNonZero);
 };
+var clipEvenOdd = function() {
+	return PDFOperator.of(PDFOperatorNames_default.ClipEvenOdd);
+};
 var cos = Math.cos;
 var sin = Math.sin;
 var tan = Math.tan;
@@ -8248,8 +8387,14 @@ var rotateDegrees = function(angle) {
 var skewRadians = function(xSkewAngle, ySkewAngle) {
 	return concatTransformationMatrix(1, tan(asNumber(xSkewAngle)), tan(asNumber(ySkewAngle)), 1, 0, 0);
 };
+var skewDegrees = function(xSkewAngle, ySkewAngle) {
+	return skewRadians(degreesToRadians(asNumber(xSkewAngle)), degreesToRadians(asNumber(ySkewAngle)));
+};
 var setDashPattern = function(dashArray, dashPhase) {
 	return PDFOperator.of(PDFOperatorNames_default.SetLineDashPattern, ["[" + dashArray.map(asPDFNumber).join(" ") + "]", asPDFNumber(dashPhase)]);
+};
+var restoreDashPattern = function() {
+	return setDashPattern([], 0);
 };
 var LineCapStyle;
 (function(LineCapStyle) {
@@ -8266,6 +8411,9 @@ var LineJoinStyle;
 	LineJoinStyle[LineJoinStyle["Round"] = 1] = "Round";
 	LineJoinStyle[LineJoinStyle["Bevel"] = 2] = "Bevel";
 })(LineJoinStyle || (LineJoinStyle = {}));
+var setLineJoin = function(style) {
+	return PDFOperator.of(PDFOperatorNames_default.SetLineJoinStyle, [asPDFNumber(style)]);
+};
 var setGraphicsState = function(state) {
 	return PDFOperator.of(PDFOperatorNames_default.SetGraphicsStateParams, [asPDFName(state)]);
 };
@@ -8305,6 +8453,28 @@ var moveTo = function(xPos, yPos) {
 var lineTo = function(xPos, yPos) {
 	return PDFOperator.of(PDFOperatorNames_default.LineTo, [asPDFNumber(xPos), asPDFNumber(yPos)]);
 };
+/**
+* @param xPos x coordinate for the lower left corner of the rectangle
+* @param yPos y coordinate for the lower left corner of the rectangle
+* @param width width of the rectangle
+* @param height height of the rectangle
+*/
+var rectangle = function(xPos, yPos, width, height) {
+	return PDFOperator.of(PDFOperatorNames_default.AppendRectangle, [
+		asPDFNumber(xPos),
+		asPDFNumber(yPos),
+		asPDFNumber(width),
+		asPDFNumber(height)
+	]);
+};
+/**
+* @param xPos x coordinate for the lower left corner of the square
+* @param yPos y coordinate for the lower left corner of the square
+* @param size width and height of the square
+*/
+var square = function(xPos, yPos, size) {
+	return rectangle(xPos, yPos, size, size);
+};
 var stroke = function() {
 	return PDFOperator.of(PDFOperatorNames_default.StrokePath);
 };
@@ -8320,6 +8490,9 @@ var endPath = function() {
 var nextLine = function() {
 	return PDFOperator.of(PDFOperatorNames_default.NextLine);
 };
+var moveText = function(x, y) {
+	return PDFOperator.of(PDFOperatorNames_default.MoveText, [asPDFNumber(x), asPDFNumber(y)]);
+};
 var showText = function(text) {
 	return PDFOperator.of(PDFOperatorNames_default.ShowText, [text]);
 };
@@ -8332,8 +8505,21 @@ var endText = function() {
 var setFontAndSize = function(name, size) {
 	return PDFOperator.of(PDFOperatorNames_default.SetFontAndSize, [asPDFName(name), asPDFNumber(size)]);
 };
+var setCharacterSpacing = function(spacing) {
+	return PDFOperator.of(PDFOperatorNames_default.SetCharacterSpacing, [asPDFNumber(spacing)]);
+};
+var setWordSpacing = function(spacing) {
+	return PDFOperator.of(PDFOperatorNames_default.SetWordSpacing, [asPDFNumber(spacing)]);
+};
+/** @param squeeze horizontal character spacing */
+var setCharacterSqueeze = function(squeeze) {
+	return PDFOperator.of(PDFOperatorNames_default.SetTextHorizontalScaling, [asPDFNumber(squeeze)]);
+};
 var setLineHeight = function(lineHeight) {
 	return PDFOperator.of(PDFOperatorNames_default.SetTextLineHeight, [asPDFNumber(lineHeight)]);
+};
+var setTextRise = function(rise) {
+	return PDFOperator.of(PDFOperatorNames_default.SetTextRise, [asPDFNumber(rise)]);
 };
 var TextRenderingMode;
 (function(TextRenderingMode) {
@@ -8346,6 +8532,9 @@ var TextRenderingMode;
 	TextRenderingMode[TextRenderingMode["FillAndOutlineAndClip"] = 6] = "FillAndOutlineAndClip";
 	TextRenderingMode[TextRenderingMode["Clip"] = 7] = "Clip";
 })(TextRenderingMode || (TextRenderingMode = {}));
+var setTextRenderingMode = function(mode) {
+	return PDFOperator.of(PDFOperatorNames_default.SetTextRenderingMode, [asPDFNumber(mode)]);
+};
 var setTextMatrix = function(a, b, c, d, e, f) {
 	return PDFOperator.of(PDFOperatorNames_default.SetTextMatrix, [
 		asPDFNumber(a),
@@ -8358,6 +8547,9 @@ var setTextMatrix = function(a, b, c, d, e, f) {
 };
 var rotateAndSkewTextRadiansAndTranslate = function(rotationAngle, xSkewAngle, ySkewAngle, x, y) {
 	return setTextMatrix(cos(asNumber(rotationAngle)), sin(asNumber(rotationAngle)) + tan(asNumber(xSkewAngle)), -sin(asNumber(rotationAngle)) + tan(asNumber(ySkewAngle)), cos(asNumber(rotationAngle)), x, y);
+};
+var rotateAndSkewTextDegreesAndTranslate = function(rotationAngle, xSkewAngle, ySkewAngle, x, y) {
+	return rotateAndSkewTextRadiansAndTranslate(degreesToRadians(asNumber(rotationAngle)), degreesToRadians(asNumber(xSkewAngle)), degreesToRadians(asNumber(ySkewAngle)), x, y);
 };
 var drawObject = function(name) {
 	return PDFOperator.of(PDFOperatorNames_default.DrawObject, [asPDFName(name)]);
@@ -8814,6 +9006,19 @@ var svgPathToOperators = function(path) {
 };
 //#endregion
 //#region node_modules/pdf-lib/es/api/operations.js
+var drawText = function(line, options) {
+	return [
+		pushGraphicsState(),
+		options.graphicsState && setGraphicsState(options.graphicsState),
+		beginText(),
+		setFillingColor(options.color),
+		setFontAndSize(options.font, options.size),
+		rotateAndSkewTextRadiansAndTranslate(toRadians(options.rotate), toRadians(options.xSkew), toRadians(options.ySkew), options.x, options.y),
+		showText(line),
+		endText(),
+		popGraphicsState()
+	].filter(Boolean);
+};
 var drawLinesOfText = function(lines, options) {
 	var operators = [
 		pushGraphicsState(),
@@ -9251,7 +9456,7 @@ var UnexpectedFieldTypeError = function(_super) {
 	}
 	return UnexpectedFieldTypeError;
 }(Error);
-(function(_super) {
+var MissingOnValueCheckError = function(_super) {
 	__extends(MissingOnValueCheckError, _super);
 	function MissingOnValueCheckError(onValue) {
 		var _this = this;
@@ -9260,7 +9465,7 @@ var UnexpectedFieldTypeError = function(_super) {
 		return _this;
 	}
 	return MissingOnValueCheckError;
-})(Error);
+}(Error);
 var FieldAlreadyExistsError = function(_super) {
 	__extends(FieldAlreadyExistsError, _super);
 	function FieldAlreadyExistsError(name) {
@@ -9281,7 +9486,7 @@ var InvalidFieldNamePartError = function(_super) {
 	}
 	return InvalidFieldNamePartError;
 }(Error);
-(function(_super) {
+var FieldExistsAsNonTerminalError = function(_super) {
 	__extends(FieldExistsAsNonTerminalError, _super);
 	function FieldExistsAsNonTerminalError(name) {
 		var _this = this;
@@ -9290,7 +9495,7 @@ var InvalidFieldNamePartError = function(_super) {
 		return _this;
 	}
 	return FieldExistsAsNonTerminalError;
-})(Error);
+}(Error);
 var RichTextFieldReadError = function(_super) {
 	__extends(RichTextFieldReadError, _super);
 	function RichTextFieldReadError(fieldName) {
@@ -16709,4 +16914,319 @@ var PDFButton = function(_super) {
 	return PDFButton;
 }(PDFField);
 //#endregion
-export { StandardFonts as n, rgb as r, PDFDocument as t };
+//#region node_modules/pdf-lib/es/index.js
+var es_exports = /* @__PURE__ */ __exportAll({
+	AFRelationship: () => AFRelationship,
+	AcroButtonFlags: () => AcroButtonFlags,
+	AcroChoiceFlags: () => AcroChoiceFlags,
+	AcroFieldFlags: () => AcroFieldFlags,
+	AcroTextFlags: () => AcroTextFlags,
+	AnnotationFlags: () => AnnotationFlags,
+	AppearanceCharacteristics: () => AppearanceCharacteristics,
+	BlendMode: () => BlendMode,
+	Cache: () => Cache,
+	CharCodes: () => CharCodes_default,
+	ColorTypes: () => ColorTypes,
+	CombedTextLayoutError: () => CombedTextLayoutError,
+	CorruptPageTreeError: () => CorruptPageTreeError,
+	CustomFontEmbedder: () => CustomFontEmbedder,
+	CustomFontSubsetEmbedder: () => CustomFontSubsetEmbedder,
+	Duplex: () => Duplex,
+	EncryptedPDFError: () => EncryptedPDFError,
+	ExceededMaxLengthError: () => ExceededMaxLengthError,
+	FieldAlreadyExistsError: () => FieldAlreadyExistsError,
+	FieldExistsAsNonTerminalError: () => FieldExistsAsNonTerminalError,
+	FileEmbedder: () => FileEmbedder,
+	FontkitNotRegisteredError: () => FontkitNotRegisteredError,
+	ForeignPageError: () => ForeignPageError,
+	ImageAlignment: () => ImageAlignment,
+	IndexOutOfBoundsError: () => IndexOutOfBoundsError,
+	InvalidAcroFieldValueError: () => InvalidAcroFieldValueError,
+	InvalidFieldNamePartError: () => InvalidFieldNamePartError,
+	InvalidMaxLengthError: () => InvalidMaxLengthError,
+	InvalidPDFDateStringError: () => InvalidPDFDateStringError,
+	InvalidTargetIndexError: () => InvalidTargetIndexError,
+	JpegEmbedder: () => JpegEmbedder,
+	LineCapStyle: () => LineCapStyle,
+	LineJoinStyle: () => LineJoinStyle,
+	MethodNotImplementedError: () => MethodNotImplementedError,
+	MissingCatalogError: () => MissingCatalogError,
+	MissingDAEntryError: () => MissingDAEntryError,
+	MissingKeywordError: () => MissingKeywordError,
+	MissingOnValueCheckError: () => MissingOnValueCheckError,
+	MissingPDFHeaderError: () => MissingPDFHeaderError,
+	MissingPageContentsEmbeddingError: () => MissingPageContentsEmbeddingError,
+	MissingTfOperatorError: () => MissingTfOperatorError,
+	MultiSelectValueError: () => MultiSelectValueError,
+	NextByteAssertionError: () => NextByteAssertionError,
+	NoSuchFieldError: () => NoSuchFieldError,
+	NonFullScreenPageMode: () => NonFullScreenPageMode,
+	NumberParsingError: () => NumberParsingError,
+	PDFAcroButton: () => PDFAcroButton,
+	PDFAcroCheckBox: () => PDFAcroCheckBox,
+	PDFAcroChoice: () => PDFAcroChoice,
+	PDFAcroComboBox: () => PDFAcroComboBox,
+	PDFAcroField: () => PDFAcroField,
+	PDFAcroForm: () => PDFAcroForm,
+	PDFAcroListBox: () => PDFAcroListBox,
+	PDFAcroNonTerminal: () => PDFAcroNonTerminal,
+	PDFAcroPushButton: () => PDFAcroPushButton,
+	PDFAcroRadioButton: () => PDFAcroRadioButton,
+	PDFAcroSignature: () => PDFAcroSignature,
+	PDFAcroTerminal: () => PDFAcroTerminal,
+	PDFAcroText: () => PDFAcroText,
+	PDFAnnotation: () => PDFAnnotation,
+	PDFArray: () => PDFArray,
+	PDFArrayIsNotRectangleError: () => PDFArrayIsNotRectangleError,
+	PDFBool: () => PDFBool,
+	PDFButton: () => PDFButton,
+	PDFCatalog: () => PDFCatalog,
+	PDFCheckBox: () => PDFCheckBox,
+	PDFContentStream: () => PDFContentStream,
+	PDFContext: () => PDFContext,
+	PDFCrossRefSection: () => PDFCrossRefSection,
+	PDFCrossRefStream: () => PDFCrossRefStream,
+	PDFDict: () => PDFDict,
+	PDFDocument: () => PDFDocument,
+	PDFDropdown: () => PDFDropdown,
+	PDFEmbeddedPage: () => PDFEmbeddedPage,
+	PDFField: () => PDFField,
+	PDFFlateStream: () => PDFFlateStream,
+	PDFFont: () => PDFFont,
+	PDFForm: () => PDFForm,
+	PDFHeader: () => PDFHeader,
+	PDFHexString: () => PDFHexString,
+	PDFImage: () => PDFImage,
+	PDFInvalidObject: () => PDFInvalidObject,
+	PDFInvalidObjectParsingError: () => PDFInvalidObjectParsingError,
+	PDFJavaScript: () => PDFJavaScript,
+	PDFName: () => PDFName,
+	PDFNull: () => PDFNull_default,
+	PDFNumber: () => PDFNumber,
+	PDFObject: () => PDFObject,
+	PDFObjectCopier: () => PDFObjectCopier,
+	PDFObjectParser: () => PDFObjectParser,
+	PDFObjectParsingError: () => PDFObjectParsingError,
+	PDFObjectStream: () => PDFObjectStream,
+	PDFObjectStreamParser: () => PDFObjectStreamParser,
+	PDFOperator: () => PDFOperator,
+	PDFOperatorNames: () => PDFOperatorNames_default,
+	PDFOptionList: () => PDFOptionList,
+	PDFPage: () => PDFPage,
+	PDFPageEmbedder: () => PDFPageEmbedder,
+	PDFPageLeaf: () => PDFPageLeaf,
+	PDFPageTree: () => PDFPageTree,
+	PDFParser: () => PDFParser,
+	PDFParsingError: () => PDFParsingError,
+	PDFRadioGroup: () => PDFRadioGroup,
+	PDFRawStream: () => PDFRawStream,
+	PDFRef: () => PDFRef,
+	PDFSignature: () => PDFSignature,
+	PDFStream: () => PDFStream,
+	PDFStreamParsingError: () => PDFStreamParsingError,
+	PDFStreamWriter: () => PDFStreamWriter,
+	PDFString: () => PDFString,
+	PDFTextField: () => PDFTextField,
+	PDFTrailer: () => PDFTrailer,
+	PDFTrailerDict: () => PDFTrailerDict,
+	PDFWidgetAnnotation: () => PDFWidgetAnnotation,
+	PDFWriter: () => PDFWriter,
+	PDFXRefStreamParser: () => PDFXRefStreamParser,
+	PageEmbeddingMismatchedContextError: () => PageEmbeddingMismatchedContextError,
+	PageSizes: () => PageSizes,
+	ParseSpeeds: () => ParseSpeeds,
+	PngEmbedder: () => PngEmbedder,
+	PrintScaling: () => PrintScaling,
+	PrivateConstructorError: () => PrivateConstructorError,
+	ReadingDirection: () => ReadingDirection,
+	RemovePageFromEmptyDocumentError: () => RemovePageFromEmptyDocumentError,
+	ReparseError: () => ReparseError,
+	RichTextFieldReadError: () => RichTextFieldReadError,
+	RotationTypes: () => RotationTypes,
+	StalledParserError: () => StalledParserError,
+	StandardFontEmbedder: () => StandardFontEmbedder,
+	StandardFontValues: () => StandardFontValues,
+	StandardFonts: () => StandardFonts,
+	TextAlignment: () => TextAlignment,
+	TextRenderingMode: () => TextRenderingMode,
+	UnbalancedParenthesisError: () => UnbalancedParenthesisError,
+	UnexpectedFieldTypeError: () => UnexpectedFieldTypeError,
+	UnexpectedObjectTypeError: () => UnexpectedObjectTypeError,
+	UnrecognizedStreamTypeError: () => UnrecognizedStreamTypeError,
+	UnsupportedEncodingError: () => UnsupportedEncodingError,
+	ViewerPreferences: () => ViewerPreferences,
+	addRandomSuffix: () => addRandomSuffix,
+	adjustDimsForRotation: () => adjustDimsForRotation,
+	appendBezierCurve: () => appendBezierCurve,
+	appendQuadraticCurve: () => appendQuadraticCurve,
+	arrayAsString: () => arrayAsString,
+	asNumber: () => asNumber,
+	asPDFName: () => asPDFName,
+	asPDFNumber: () => asPDFNumber,
+	assertEachIs: () => assertEachIs,
+	assertInteger: () => assertInteger,
+	assertIs: () => assertIs,
+	assertIsOneOf: () => assertIsOneOf,
+	assertIsOneOfOrUndefined: () => assertIsOneOfOrUndefined,
+	assertIsSubset: () => assertIsSubset,
+	assertMultiple: () => assertMultiple,
+	assertOrUndefined: () => assertOrUndefined,
+	assertPositive: () => assertPositive,
+	assertRange: () => assertRange,
+	assertRangeOrUndefined: () => assertRangeOrUndefined,
+	backtick: () => backtick,
+	beginMarkedContent: () => beginMarkedContent,
+	beginText: () => beginText,
+	breakTextIntoLines: () => breakTextIntoLines,
+	byAscendingId: () => byAscendingId,
+	bytesFor: () => bytesFor,
+	canBeConvertedToUint8Array: () => canBeConvertedToUint8Array,
+	charAtIndex: () => charAtIndex,
+	charFromCode: () => charFromCode,
+	charFromHexCode: () => charFromHexCode,
+	charSplit: () => charSplit,
+	cleanText: () => cleanText,
+	clip: () => clip,
+	clipEvenOdd: () => clipEvenOdd,
+	closePath: () => closePath,
+	cmyk: () => cmyk,
+	colorToComponents: () => colorToComponents,
+	componentsToColor: () => componentsToColor,
+	concatTransformationMatrix: () => concatTransformationMatrix,
+	copyStringIntoBuffer: () => copyStringIntoBuffer,
+	createPDFAcroField: () => createPDFAcroField,
+	createPDFAcroFields: () => createPDFAcroFields,
+	createTypeErrorMsg: () => createTypeErrorMsg,
+	createValueErrorMsg: () => createValueErrorMsg,
+	decodeFromBase64: () => decodeFromBase64,
+	decodeFromBase64DataUri: () => decodeFromBase64DataUri,
+	decodePDFRawStream: () => decodePDFRawStream,
+	defaultButtonAppearanceProvider: () => defaultButtonAppearanceProvider,
+	defaultCheckBoxAppearanceProvider: () => defaultCheckBoxAppearanceProvider,
+	defaultDropdownAppearanceProvider: () => defaultDropdownAppearanceProvider,
+	defaultOptionListAppearanceProvider: () => defaultOptionListAppearanceProvider,
+	defaultRadioGroupAppearanceProvider: () => defaultRadioGroupAppearanceProvider,
+	defaultTextFieldAppearanceProvider: () => defaultTextFieldAppearanceProvider,
+	degrees: () => degrees,
+	degreesToRadians: () => degreesToRadians,
+	drawButton: () => drawButton,
+	drawCheckBox: () => drawCheckBox,
+	drawCheckMark: () => drawCheckMark,
+	drawEllipse: () => drawEllipse,
+	drawEllipsePath: () => drawEllipsePath,
+	drawImage: () => drawImage,
+	drawLine: () => drawLine,
+	drawLinesOfText: () => drawLinesOfText,
+	drawObject: () => drawObject,
+	drawOptionList: () => drawOptionList,
+	drawPage: () => drawPage,
+	drawRadioButton: () => drawRadioButton,
+	drawRectangle: () => drawRectangle,
+	drawSvgPath: () => drawSvgPath,
+	drawText: () => drawText,
+	drawTextField: () => drawTextField,
+	drawTextLines: () => drawTextLines,
+	encodeToBase64: () => encodeToBase64,
+	endMarkedContent: () => endMarkedContent,
+	endPath: () => endPath,
+	endText: () => endText,
+	error: () => error,
+	escapeRegExp: () => escapeRegExp,
+	escapedNewlineChars: () => escapedNewlineChars,
+	fill: () => fill,
+	fillAndStroke: () => fillAndStroke,
+	findLastMatch: () => findLastMatch,
+	getType: () => getType,
+	grayscale: () => grayscale,
+	hasSurrogates: () => hasSurrogates,
+	hasUtf16BOM: () => hasUtf16BOM,
+	highSurrogate: () => highSurrogate,
+	isNewlineChar: () => isNewlineChar,
+	isStandardFont: () => isStandardFont,
+	isType: () => isType,
+	isWithinBMP: () => isWithinBMP,
+	last: () => last,
+	layoutCombedText: () => layoutCombedText,
+	layoutMultilineText: () => layoutMultilineText,
+	layoutSinglelineText: () => layoutSinglelineText,
+	lineSplit: () => lineSplit,
+	lineTo: () => lineTo,
+	lowSurrogate: () => lowSurrogate,
+	mergeIntoTypedArray: () => mergeIntoTypedArray,
+	mergeLines: () => mergeLines,
+	mergeUint8Arrays: () => mergeUint8Arrays,
+	moveText: () => moveText,
+	moveTo: () => moveTo,
+	newlineChars: () => newlineChars,
+	nextLine: () => nextLine,
+	normalizeAppearance: () => normalizeAppearance,
+	numberToString: () => numberToString,
+	padStart: () => padStart,
+	parseDate: () => parseDate,
+	pdfDocEncodingDecode: () => pdfDocEncodingDecode,
+	pluckIndices: () => pluckIndices,
+	popGraphicsState: () => popGraphicsState,
+	pushGraphicsState: () => pushGraphicsState,
+	radians: () => radians,
+	radiansToDegrees: () => radiansToDegrees,
+	range: () => range,
+	rectangle: () => rectangle,
+	rectanglesAreEqual: () => rectanglesAreEqual,
+	reduceRotation: () => reduceRotation,
+	restoreDashPattern: () => restoreDashPattern,
+	reverseArray: () => reverseArray,
+	rgb: () => rgb,
+	rotateAndSkewTextDegreesAndTranslate: () => rotateAndSkewTextDegreesAndTranslate,
+	rotateAndSkewTextRadiansAndTranslate: () => rotateAndSkewTextRadiansAndTranslate,
+	rotateDegrees: () => rotateDegrees,
+	rotateInPlace: () => rotateInPlace,
+	rotateRadians: () => rotateRadians,
+	rotateRectangle: () => rotateRectangle,
+	scale: () => scale,
+	setCharacterSpacing: () => setCharacterSpacing,
+	setCharacterSqueeze: () => setCharacterSqueeze,
+	setDashPattern: () => setDashPattern,
+	setFillingCmykColor: () => setFillingCmykColor,
+	setFillingColor: () => setFillingColor,
+	setFillingGrayscaleColor: () => setFillingGrayscaleColor,
+	setFillingRgbColor: () => setFillingRgbColor,
+	setFontAndSize: () => setFontAndSize,
+	setGraphicsState: () => setGraphicsState,
+	setLineCap: () => setLineCap,
+	setLineHeight: () => setLineHeight,
+	setLineJoin: () => setLineJoin,
+	setLineWidth: () => setLineWidth,
+	setStrokingCmykColor: () => setStrokingCmykColor,
+	setStrokingColor: () => setStrokingColor,
+	setStrokingGrayscaleColor: () => setStrokingGrayscaleColor,
+	setStrokingRgbColor: () => setStrokingRgbColor,
+	setTextMatrix: () => setTextMatrix,
+	setTextRenderingMode: () => setTextRenderingMode,
+	setTextRise: () => setTextRise,
+	setWordSpacing: () => setWordSpacing,
+	showText: () => showText,
+	singleQuote: () => singleQuote,
+	sizeInBytes: () => sizeInBytes,
+	skewDegrees: () => skewDegrees,
+	skewRadians: () => skewRadians,
+	sortedUniq: () => sortedUniq,
+	square: () => square,
+	stroke: () => stroke,
+	sum: () => sum,
+	toCharCode: () => toCharCode,
+	toCodePoint: () => toCodePoint,
+	toDegrees: () => toDegrees,
+	toHexString: () => toHexString,
+	toHexStringOfMinLength: () => toHexStringOfMinLength,
+	toRadians: () => toRadians,
+	toUint8Array: () => toUint8Array,
+	translate: () => translate,
+	typedArrayFor: () => typedArrayFor,
+	utf16Decode: () => utf16Decode,
+	utf16Encode: () => utf16Encode,
+	utf8Encode: () => utf8Encode,
+	values: () => values,
+	waitForTick: () => waitForTick
+});
+//#endregion
+export { es_exports as t };
